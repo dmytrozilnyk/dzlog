@@ -3,6 +3,7 @@ package dzlog
 import (
 	"io"
 	"os"
+	"strings"
 )
 
 const (
@@ -40,9 +41,20 @@ func defaultOpts() opts {
 	}
 }
 
-func LogLevel(logLevel LoggerLevel) OptsFunc {
+func LogLevel(logLevel string) OptsFunc {
 	return func(opts *opts) {
-		opts.logLevel = logLevel
+		opts.logLevel = stringToLogLevel(logLevel)
+	}
+}
+
+func stringToLogLevel(level string) LoggerLevel {
+	level = strings.ToUpper(level) //Upper string
+
+	switch LoggerLevel(level) {
+	case ErrorLevel, WarnLevel, InfoLevel, DebugLevel:
+		return LoggerLevel(level)
+	default:
+		return InfoLevel //default level
 	}
 }
 
