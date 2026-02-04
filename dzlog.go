@@ -2,7 +2,6 @@ package dzlog
 
 import (
 	"context"
-	"github.com/davecgh/go-spew/spew"
 	"io"
 	"math"
 	"os"
@@ -13,30 +12,20 @@ import (
 	"time"
 
 	"github.com/apsdehal/go-logger"
+	"github.com/davecgh/go-spew/spew"
 )
 
-func NewLog(opts ...OptsFunc) Dzlog {
+func New(opts ...OptsFunc) Dzlog {
 	o := defaultOpts()
 	for _, fn := range opts {
 		fn(&o)
 	}
 
 	if os.Getenv(envLogLevel) != "" { //Get log level from environment variable LOG_LEVEL
-		o.logLevel = StringToLogLevel(os.Getenv(envLogLevel))
+		o.logLevel = stringToLogLevel(os.Getenv(envLogLevel))
 	}
 
 	return &customLog{opts: o}
-}
-
-func StringToLogLevel(level string) LoggerLevel {
-	level = strings.ToUpper(level) //Upper string
-
-	switch LoggerLevel(level) {
-	case ErrorLevel, WarnLevel, InfoLevel, DebugLevel:
-		return LoggerLevel(level)
-	default:
-		return InfoLevel //default level
-	}
 }
 
 func (l *customLog) GetTimeNow() time.Time {
