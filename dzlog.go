@@ -38,59 +38,59 @@ func (l *customLog) GetTimeNow() time.Time {
 
 func (l *customLog) Debug(msg ...any) {
 	if l.opts.logLevel == DebugLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, DebugLevel, l.opts.logMaxLength, nil, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, DebugLevel, generateMsg(msg), l.opts.logMaxLength, nil, l.opts.env)
 	}
 }
 
 func (l *customLog) DebugTime(msg ...any) {
 	if l.opts.logLevel == DebugLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, DebugLevel, l.opts.logMaxLength, nil, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, DebugLevel, generateMsg(msg), l.opts.logMaxLength, nil, l.opts.env)
 	}
 }
 
 func (l *customLog) Info(msg ...any) {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, InfoLevel, l.opts.logMaxLength, nil, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, InfoLevel, generateMsg(msg), l.opts.logMaxLength, nil, l.opts.env)
 	}
 }
 
 func (l *customLog) Warning(msg ...any) {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel || l.opts.logLevel == WarnLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, WarnLevel, l.opts.logMaxLength, nil, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, WarnLevel, generateMsg(msg), l.opts.logMaxLength, nil, l.opts.env)
 	}
 }
 
 func (l *customLog) Error(msg ...any) {
-	selectLogType(typeLog, l.opts.stdErr, l.opts.module, ErrorLevel, l.opts.logMaxLength, nil, msg)
+	apacheLog(l.opts.stdOut, l.opts.module, ErrorLevel, generateMsg(msg), l.opts.logMaxLength, nil, l.opts.env)
 }
 
 // Context
 func (l *customLog) DebugCtx(ctx context.Context, msg ...any) {
 	if l.opts.logLevel == DebugLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, DebugLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, DebugLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 }
 
 func (l *customLog) DebugTimeCtx(ctx context.Context, msg ...any) {
 	if l.opts.logLevel == DebugLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, DebugLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, DebugLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 }
 
 func (l *customLog) InfoCtx(ctx context.Context, msg ...any) {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, InfoLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, InfoLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 }
 
 func (l *customLog) WarningCtx(ctx context.Context, msg ...any) {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel || l.opts.logLevel == WarnLevel {
-		selectLogType(typeLog, l.opts.stdOut, l.opts.module, WarnLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, WarnLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 }
 
 func (l *customLog) ErrorCtx(ctx context.Context, msg ...any) {
-	selectLogType(typeLog, l.opts.stdErr, l.opts.module, ErrorLevel, l.opts.logMaxLength, ctx, msg)
+	apacheLog(l.opts.stdOut, l.opts.module, ErrorLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 }
 
 func (l *customLog) CalculateDifference(initial time.Time) time.Duration {
@@ -104,36 +104,27 @@ func (l *customLog) CalculateDifference(initial time.Time) time.Duration {
 // return context
 func (l *customLog) DebugReturnCtx(ctx context.Context, msg ...any) context.Context {
 	if l.opts.logLevel == DebugLevel {
-		ctx = selectLogType(typeLog, l.opts.stdOut, l.opts.module, DebugLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, DebugLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 	return ctx
 }
 
 func (l *customLog) InfoReturnCtx(ctx context.Context, msg ...any) context.Context {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel {
-		ctx = selectLogType(typeLog, l.opts.stdOut, l.opts.module, InfoLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, InfoLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 	return ctx
 }
 
 func (l *customLog) WarningReturnCtx(ctx context.Context, msg ...any) context.Context {
 	if l.opts.logLevel == DebugLevel || l.opts.logLevel == InfoLevel || l.opts.logLevel == WarnLevel {
-		ctx = selectLogType(typeLog, l.opts.stdOut, l.opts.module, WarnLevel, l.opts.logMaxLength, ctx, msg)
+		apacheLog(l.opts.stdOut, l.opts.module, WarnLevel, generateMsg(msg), l.opts.logMaxLength, ctx, l.opts.env)
 	}
 
 	return ctx
 }
 
-// Aux functions
-func selectLogType(logType string, out io.Writer, module string, level LoggerLevel, logMaxLength int, ctx context.Context, msg []any) context.Context {
-
-	if logType == "APACHE" {
-		ctx = apacheLog(out, module, level, generateMsg(msg), logMaxLength, ctx)
-	}
-	return ctx
-}
-
-func apacheLog(out io.Writer, module string, level LoggerLevel, msg string, logMaxLength int, ctx context.Context) context.Context {
+func apacheLog(out io.Writer, module string, level LoggerLevel, msg string, logMaxLength int, ctx context.Context, env string) context.Context {
 	logCustom, err := logger.New(module, out)
 	if err != nil {
 		panic(err)
@@ -151,11 +142,11 @@ func apacheLog(out io.Writer, module string, level LoggerLevel, msg string, logM
 		fileName = "???"
 		line = 0
 	}
-	var corrId = ""
+	var tracId = ""
 
 	if ctx != nil {
-		if ctx.Value(correlationId) != nil {
-			corrId = ctx.Value(correlationId).(string)
+		if ctx.Value(tracerId) != nil {
+			tracId = ctx.Value(tracerId).(string)
 		}
 	}
 
@@ -175,15 +166,15 @@ func apacheLog(out io.Writer, module string, level LoggerLevel, msg string, logM
 
 		switch level {
 		case ErrorLevel:
-			logCustom.ErrorF(":%s][pid:%d tid:%d][correlationId: %s][entries: %s][%s:%d] %s", level, pid, tid, corrId, entries, fileName, line, mat)
+			logCustom.ErrorF(":%s][env:%s][pid:%d tid:%d][tracerId: %s][entries: %s][%s:%d] %s", level, env, pid, tid, tracId, entries, fileName, line, mat)
 		case WarnLevel:
-			logCustom.WarningF(":%s][pid:%d tid:%d][correlationId: %s][entries: %s][%s:%d] %s", level, pid, tid, corrId, entries, fileName, line, mat)
+			logCustom.WarningF(":%s][env:%s][pid:%d tid:%d][tracerId: %s][entries: %s][%s:%d] %s", level, env, pid, tid, tracId, entries, fileName, line, mat)
 		case InfoLevel:
-			logCustom.InfoF(":%s][pid:%d tid:%d][correlationId: %s][entries: %s][%s:%d] %s", level, pid, tid, corrId, entries, fileName, line, mat)
+			logCustom.InfoF(":%s][env:%s][pid:%d tid:%d][tracerId: %s][entries: %s][%s:%d] %s", level, env, pid, tid, tracId, entries, fileName, line, mat)
 		case DebugLevel:
-			logCustom.DebugF(":%s][pid:%d tid:%d][correlationId: %s][entries: %s][%s:%d] %s", level, pid, tid, corrId, entries, fileName, line, mat)
+			logCustom.DebugF(":%s][env:%s][pid:%d tid:%d][tracer: %s][entries: %s][%s:%d] %s", level, env, pid, tid, tracId, entries, fileName, line, mat)
 		default:
-			logCustom.InfoF(":%s][pid:%d tid:%d][correlationId: %s][entries: %s][%s:%d] %s", level, pid, tid, corrId, entries, fileName, line, mat)
+			logCustom.InfoF(":%s][env:%s][pid:%d tid:%d][tracerId: %s][entries: %s][%s:%d] %s", level, env, pid, tid, tracId, entries, fileName, line, mat)
 		}
 	}
 
