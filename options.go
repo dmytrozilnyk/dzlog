@@ -7,10 +7,9 @@ import (
 )
 
 const (
-	typeLog          string = "APACHE"
 	envLogLevel      string = "LOG_LEVEL"
 	defaultMsgLength int    = 3000
-	correlationId    string = "correlationId"
+	tracerId         string = "tracerId"
 )
 
 type customLog struct {
@@ -27,6 +26,8 @@ type opts struct {
 	//Log output
 	stdOut io.Writer
 	stdErr io.Writer
+	//Environment
+	env string
 }
 
 type OptsFunc func(*opts)
@@ -38,6 +39,7 @@ func defaultOpts() opts {
 		logMaxLength: defaultMsgLength,
 		stdOut:       os.Stdout,
 		stdErr:       os.Stderr,
+		env:          "dev",
 	}
 }
 
@@ -70,5 +72,11 @@ func LogMaxLength(numberOfChar int) OptsFunc {
 		if numberOfChar <= 0 {
 			opts.logMaxLength = defaultMsgLength
 		}
+	}
+}
+
+func LogEnvironment(env string) OptsFunc {
+	return func(opts *opts) {
+		opts.env = env
 	}
 }
